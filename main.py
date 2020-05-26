@@ -1,27 +1,6 @@
-from fastapi import Body, FastAPI, Path, Query
-from pydantic import BaseModel, Field, HttpUrl
-from typing import List, Set, Optional
-
-
-class Owner(BaseModel):
-    owner_name: str = Field(..., min_length=2, max_length=20)
-    owner_surname: str = Field(..., min_length=2, max_length=20)
-    owner_age: int = Field(None, gt=0)
-
-
-class DogImage(BaseModel):
-    image_url: HttpUrl
-    image_name: str = Field(None, min_length=2)
-
-
-class Dog(BaseModel):
-    dog_name: str = Field(..., min_length=2, max_length=20)
-    dog_breed: str = Field(..., min_length=2, max_length=20)
-    dog_age: int = Field(None, gt=0)
-    dog_weight: float = Field(None, gt=0)
-    dog_tags: Set[Optional[str]]
-    dog_owner: Owner
-    dog_image: List[Optional[DogImage]]
+from datetime import datetime, time, timedelta
+from fastapi import Body, FastAPI, Query
+from uuid import UUID
 
 
 app = FastAPI()
@@ -30,11 +9,22 @@ app = FastAPI()
 @app.put('/dogs/{dog_id}')
 async def update_dog(
     *,
-    dog_id: int = Path(..., ge=0),
-    dog: Dog = Body(..., embed=True),
-    q: str = Query(None)
+    dog_id: UUID,
+    dog_name: str = Query(..., min_length=2, max_length=20),
+    start_datetime: datetime = Body(None),
+    end_datetime: datetime = Body(None),
+    repeat_at: time = Body(None),
+    process_after: timedelta = Body(None),
 ):
-    result = {'dog_id': dog_id, 'Dog': dog}
-    if(q):
-        result.update({'description': q})
-    return result
+    start_process = start_datetime + process_after
+    duration = end_datetime - start_process
+    return {
+        "dog_id": dog_id,
+        "dog_name": dog_name,
+        "start_datetime": start_datetime,
+        "end_datetime": end_datetime,
+        "repeat_at": repeat_at,
+        "process_after": process_after,
+        "start_process": start_process,
+        "duration": duration,
+    }

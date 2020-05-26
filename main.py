@@ -1,42 +1,40 @@
-from fastapi import Body, FastAPI, Query, Path
-from pydantic import BaseModel, Field
+from fastapi import Body, FastAPI, Path, Query
+from pydantic import BaseModel, Field, HttpUrl
 from typing import List, Set, Optional
 
 
-class Car(BaseModel):
-    manufacturer: str = Field(..., min_length=5, max_length=20)
-    reference: str = Field(..., min_length=5, max_length=30)
-    year: int = Field(..., ge=1900, le=2021)
-    color: Optional[str] = Field(None, min_length=5, max_length=20)
-    price: float = Field(..., ge=0)
-    tags: Set[Optional[str]] = []
-    #tags: List[Optional[str]] = []
+class Owner(BaseModel):
+    owner_name: str = Field(..., min_length=2, max_length=20)
+    owner_surname: str = Field(..., min_length=2, max_length=20)
+    owner_age: int = Field(None, gt=0)
 
 
-class User(BaseModel):
-    name: str
-    surname: str
+class DogImage(BaseModel):
+    image_url: HttpUrl
+    image_name: str = Field(None, min_length=2)
+
+
+class Dog(BaseModel):
+    dog_name: str = Field(..., min_length=2, max_length=20)
+    dog_breed: str = Field(..., min_length=2, max_length=20)
+    dog_age: int = Field(None, gt=0)
+    dog_weight: float = Field(None, gt=0)
+    dog_tags: Set[Optional[str]]
+    dog_owner: Owner
+    dog_image: List[Optional[DogImage]]
 
 
 app = FastAPI()
 
 
-@app.put('/user/{user_id}/car/{car_id}')
-async def update_car(
+@app.put('/dogs/{dog_id}')
+async def update_dog(
     *,
-    user_id: int = Path(..., ge=0),
-    user: User = Body(..., embed=True),
-    q_user: str = Body(None, max_length=30),
-    car: Car = Body(..., embed=True),
-    car_id: int = Path(..., ge=0),
-    q_car: str = Query(None, min_length=5, max_length=30)
+    dog_id: int = Path(..., ge=0),
+    dog: Dog = Body(..., embed=True),
+    q: str = Query(None)
 ):
-    result = {'user id': user_id, 'user': user}
-    if(q_user):
-        result.update({'user description': q_user})
-
-    result.update({'car id:': car_id, 'car': car})
-    if(q_car):
-        result.update({'car description': q_car})
-
+    result = {'dog_id': dog_id, 'Dog': dog}
+    if(q):
+        result.update({'description': q})
     return result

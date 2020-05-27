@@ -66,7 +66,7 @@ async def update_user(
     return {'message': message}
 
 
-@app.patch('/users/patch/{user_id}', response_model=models.UserOut, tags=['users'])
+@app.patch('/user/patch/{user_id}', response_model=models.UserOut, tags=['users'])
 async def update_partial_user(user_id: int, user: models.UserIn):
     if user_id not in users_storage:
         raise HTTPException(
@@ -117,7 +117,7 @@ async def get_item_by_id(
     return models.Item(**found_item)
 
 
-@app.post('/items/add_item/{item_id}', tags=['items'])
+@app.post('/item/add_item/{item_id}', tags=['items'])
 async def new_item(
     *,
     item_id: int = Path(..., ge=0),
@@ -133,7 +133,7 @@ async def new_item(
     return {'message': message}
 
 
-@app.put('/items/update_item/{item_id}', tags=['items'])
+@app.put('/item/update_item/{item_id}', tags=['items'])
 async def update_all_item(
     *,
     item_id: int = Path(..., ge=0),
@@ -149,7 +149,7 @@ async def update_all_item(
     return {'message': message}
 
 
-@app.patch('/items/patch/{item_id}', response_model=models.Item, tags=['items'])
+@app.patch('/item/patch/{item_id}', response_model=models.Item, tags=['items'])
 async def update_partial_item(item_id: int, item: models.Item):
     if item_id not in items_storage:
         raise HTTPException(

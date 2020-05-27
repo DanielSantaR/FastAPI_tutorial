@@ -1,45 +1,46 @@
-from fastapi import FastAPI, Path
-from pydantic import BaseModel, EmailStr, Field
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+from typing import List, Union
 
 
-class User(BaseModel):
-    username: str
-    email: EmailStr
+class Person(BaseModel):
+    name: str
+    age: int
+    sex: str
+    profession: str
 
 
-class UserAccountBD(User):
-    hashed_password: str
-    age: int = None
+class Student(Person):
+    profession = "student"
+    student_grade: int = Field(..., ge=0, le=11)
 
 
-class UserIn(User):
-    password: str
-    age: int = None
+class Teacher(Person):
+    profession = "teacher"
+    teacher_courses: List[int] = Field(..., ge=0, le=11)
 
 
-class UserOut(User):
-    pass
+people = {
+    "person_1": { 
+        "name": "juan",
+        "age": 20,
+        "sex": "male",
+        "student_grade": 10,
+        },
+    "person_2": {
+        "name": "lucas",
+        "age": 40,
+        "sex": "male",
+        "teacher_courses": [7,8,9,10],        
+    },
+}
 
 
 app = FastAPI()
 
-
-def fake_password(original_password: str):
-    return 'fake' + original_password + 'fake'
-
-
-def save_user_db(user_in: UserIn):
-    hashed_password = fake_password(user_in.password)
-    user_db = UserAccountBD(**user_in.dict(), hashed_password=hashed_password)
-    print('User saved successfully')
-    return user_db
-
-
-@app.post('/new/', response_model=UserOut)
-async def new_user(
+@app.get('/{person_id}', response_model=Union[Student, Teacher])
+async def get_anyone(
     *,
-    user: UserIn
+    person_id: str
 ):
-    saved_user = save_user_db(user)
-    return saved_user
-
+    return people[person_id]

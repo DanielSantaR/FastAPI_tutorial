@@ -73,18 +73,38 @@ async def unicorn_exception_handler(request: Request, exc: UnicornException):
     )
 
 
-@app.get('/user/{user_id}', response_model=UserOut)
+@app.get(
+    '/user/{user_id}',
+    response_model=UserOut,
+    tags=['users'],
+    summary='get user by id',
+    response_description='The found user with id',
+)
 async def get_user_by_id(
     *,
     user_id: int
 ):
+    """
+    Get all the information of a user
+
+    - **user_name:** required
+    - **surname:** required
+    - **nationality:** required
+    - **age:** optional
+    """
     if user_id not in users:
         raise UnicornException(user_id)
     found_user = users[user_id]
     return UserOut(**found_user)
 
 
-@app.get('/item/{item_id}', response_model=Item)
+@app.get(
+    '/item/{item_id}',
+    response_model=Item,
+    tags=['items'],
+    description='get all the information of an item by id',
+    deprecated=True,
+)
 async def get_item_by_id(
     *,
     item_id: int

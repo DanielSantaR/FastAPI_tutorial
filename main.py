@@ -1,40 +1,45 @@
-from fastapi import Body, FastAPI, Path, Query
-from pydantic import BaseModel, Field, HttpUrl
-from typing import List, Set, Optional
+from fastapi import FastAPI, Path
+from pydantic import BaseModel, EmailStr, Field
 
 
-class Owner(BaseModel):
-    owner_name: str = Field(..., min_length=2, max_length=20)
-    owner_surname: str = Field(..., min_length=2, max_length=20)
-    owner_age: int = Field(None, gt=0)
+class User(BaseModel):
+    username: str
+    email: EmailStr
 
 
-class DogImage(BaseModel):
-    image_url: HttpUrl
-    image_name: str = Field(None, min_length=2)
+class UserAccountBD(User):
+    hashed_password: str
+    age: int = None
 
 
-class Dog(BaseModel):
-    dog_name: str = Field(..., min_length=2, max_length=20)
-    dog_breed: str = Field(..., min_length=2, max_length=20)
-    dog_age: int = Field(None, gt=0)
-    dog_weight: float = Field(None, gt=0)
-    dog_tags: Set[Optional[str]]
-    dog_owner: Owner
-    dog_image: List[Optional[DogImage]]
+class UserIn(User):
+    password: str
+    age: int = None
 
-class DogOut(BaseModel):
-    dog_name: str = Field(..., min_length=2, max_length=20)
-    dog_breed: str = Field(..., min_length=2, max_length=20)
+
+class UserOut(User):
+    pass
 
 
 app = FastAPI()
 
 
-@app.put('/dogs/{dog_id}', response_model=DogOut)
-async def update_dog(
+def fake_password(original_password: str):
+    return 'fake' + original_password + 'fake'
+
+
+def save_user_db(user_in: UserIn):
+    hashed_password = fake_password(user_in.password)
+    user_db = UserAccountBD(**user_in.dict(), hashed_password=hashed_password)
+    print('User saved successfully')
+    return user_db
+
+
+@app.post('/new/', response_model=UserOut)
+async def new_user(
     *,
-    dog_id: int = Path(..., ge=0),
-    dog: Dog = Body(..., embed=True)
+    user: UserIn
 ):
-    return dog
+    saved_user = save_user_db(user)
+    return saved_user
+

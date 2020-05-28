@@ -1,11 +1,33 @@
 from db import items_storage, users_storage
 from fastapi import FastAPI, HTTPException, Path
 from fastapi.encoders import jsonable_encoder
+
+# TODO: 
+# es meejor importar las clases, en este caso modelos
+# de pydantic de est forma
+
+# from models import UserIn, ...
+
+# de esta forma evitas estar escribiendo models en todo el codigo
+# TODO
+
 import models
 
 
 app = FastAPI()
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+
+# la definicion de la funcion podria ser mejor
+
+# async def get_user_by_id(*, user_id: int):
+
+# no supera los 80 caracteres y es mas facil de leer
+
+# TODO
 
 @app.get(
     '/user/{user_id}',
@@ -31,8 +53,16 @@ async def get_user_by_id(
             status_code=404, detail=f"No user found with id {user_id}"
         )
     found_user = users_storage[user_id]
+# TODO:
+# buen uso del destructor a la hora de crear un modelo nuevo
+# TODO
     return models.UserOut(**found_user)
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+# TODO
 
 @app.post('/user/add_user/{user_id}', tags=['users'])
 async def new_user(
@@ -44,11 +74,27 @@ async def new_user(
         raise HTTPException(
             status_code=409, detail=f"A user with id {user_id} already exists"
         )
+
+# TODO:
+# en vez de usar __dict__ es mas recomendable usar la funcion 
+# propia de pydantic dict()
+# users_storage.update({user_id: user.dict()})
+# TODO
+
     users_storage.update({user_id: user.__dict__})
 
     message = "User successfully saved"
     return {'message': message}
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+
+# este metodo de actualizar el usuario seria bueno hacerlo 
+# de forma en que no toque ingresar otra vez todos los campos,
+# mas bien que uno ingrese el que quiere actualizar
+# TODO
 
 @app.put('/user/update_user/{user_id}', tags=['users'])
 async def update_user(
@@ -60,6 +106,12 @@ async def update_user(
         raise HTTPException(
             status_code=404, detail=f"No user found with id {user_id}"
         )
+
+# TODO:
+# en vez de usar __dict__ es mas recomendable usar la funcion 
+# propia de pydantic dict()
+# TODO
+
     users_storage[user_id] = user.__dict__
 
     message = "User successfully updated"
@@ -80,6 +132,11 @@ async def update_partial_user(user_id: int, user: models.UserIn):
     message = "User successfully updated"
     return {'message': message}
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+# TODO
 
 @app.delete('/user/delete_user/{user_id}', tags=['users'])
 async def delete_user(
@@ -95,6 +152,11 @@ async def delete_user(
     message = "User successfully deleted"
     return {'message': message}
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+# TODO
 
 @app.get('/item/{item_id}', response_model=models.Item, tags=['items'])
 async def get_item_by_id(
@@ -127,11 +189,26 @@ async def new_item(
         raise HTTPException(
             status_code=409, detail=f"An item with id {item_id} already exists"
         )
+
+# TODO:
+# en vez de usar __dict__ es mas recomendable usar la funcion 
+# propia de pydantic dict()
+# TODO
+
     items_storage.update({item_id: item.__dict__})
 
     message = "Item successfully saved"
     return {'message': message}
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+
+# este metodo de actualizar el item seria bueno hacerlo 
+# de forma en que no toque ingresar otra vez todos los campos,
+# mas bien que uno ingrese el que quiere actualizar
+# TODO
 
 @app.put('/item/update_item/{item_id}', tags=['items'])
 async def update_all_item(
@@ -143,6 +220,12 @@ async def update_all_item(
         raise HTTPException(
             status_code=404, detail=f"No item found with id {item_id}"
         )
+
+# TODO:
+# en vez de usar __dict__ es mas recomendable usar la funcion 
+# propia de pydantic dict()
+# TODO
+
     items_storage[item_id] = item.__dict__
 
     message = "Item successfully updated"
@@ -163,6 +246,11 @@ async def update_partial_item(item_id: int, item: models.Item):
     message = "Item successfully updated"
     return {'message': message}
 
+# TODO:
+# En el PEP8 se habla de no superar los 80 caracteres en
+# una misma linea de codigo pero tampoco es bueno exagerar queriendo
+# que todo quede muy corto
+# TODO
 
 @app.delete('/item/delete_item/{item_id}', tags=['items'])
 async def delete_item(

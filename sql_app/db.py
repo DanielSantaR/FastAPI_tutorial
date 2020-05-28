@@ -12,9 +12,10 @@ users_storage = {
         'surname': 'ocampo',
         'nationality': 'rusian',
         'age': 20,
-        'password': 'abcdf'
+        'password': 'abcdfg'
     },
 }
+
 
 items_storage = {
     0: {

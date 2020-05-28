@@ -1,4 +1,4 @@
-from endpoints import app
+from sql_app.endpoints import app
 from fastapi import FastAPI
 import uvicorn
 
